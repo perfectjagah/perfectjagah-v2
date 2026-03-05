@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
@@ -8,6 +8,8 @@ import {
   Shield,
   Star,
   Clock,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getProperties } from "@/lib/api";
@@ -66,6 +68,20 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [type, setType] = useState("");
+  const [typeOpen, setTypeOpen] = useState(false);
+  const typeDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        typeDropdownRef.current &&
+        !typeDropdownRef.current.contains(e.target as Node)
+      )
+        setTypeOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const { data: featuredData, isLoading } = useQuery({
     queryKey: ["featured-properties"],
@@ -105,7 +121,7 @@ export default function HomePage() {
         />
 
         {/* Hero content */}
-        <div className="relative mx-auto max-w-7xl w-full px-4 pb-0 pt-32 sm:px-6">
+        <div className="relative mx-auto max-w-7xl w-full px-4 pb-12 pt-6 sm:px-6">
           {/* Category chips */}
           <div className="flex gap-2 flex-wrap mb-5">
             {["House", "Apartment", "Residential"].map((chip) => (
@@ -135,7 +151,7 @@ export default function HomePage() {
           </p>
 
           {/* Floating search card */}
-          <div className="mt-10 mb-0 rounded-3xl bg-white shadow-2xl p-5 max-w-3xl">
+          <div className="mt-10 mb-0 rounded-3xl bg-white shadow-2xl p-5 max-w-3xl overflow-visible">
             <p className="text-xs font-semibold text-muted-400 uppercase tracking-widest mb-4">
               Find the best place
             </p>
@@ -181,24 +197,64 @@ export default function HomePage() {
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Property Type
                 </label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-muted-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-muted/50 text-gray-700"
-                >
-                  <option value="">All Types</option>
-                  {PROPERTY_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
+                <div ref={typeDropdownRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setTypeOpen((o) => !o)}
+                    className={`w-full h-10 pl-3 pr-8 rounded-xl border text-sm text-left transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white flex items-center justify-between ${
+                      typeOpen
+                        ? "border-amber-400 ring-2 ring-amber-400"
+                        : "border-muted-200 hover:border-amber-300"
+                    }`}
+                  >
+                    <span
+                      className={
+                        type ? "text-charcoal font-medium" : "text-gray-400"
+                      }
+                    >
+                      {type || "All Types"}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      className={`absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-transform duration-200 ${typeOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  {typeOpen && (
+                    <div className="absolute z-50 bottom-[calc(100%+6px)] left-0 w-full bg-white rounded-2xl shadow-xl border border-muted-100 py-1.5 overflow-hidden">
+                      {["", ...PROPERTY_TYPES].map((t) => (
+                        <button
+                          key={t || "all"}
+                          type="button"
+                          onClick={() => {
+                            setType(t);
+                            setTypeOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                            type === t
+                              ? "bg-amber-50 text-amber-700 font-semibold"
+                              : "text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          <span>{t || "All Types"}</span>
+                          {type === t && (
+                            <Check size={13} className="text-amber-500" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="sm:col-span-1 flex items-end">
-                <Button onClick={handleSearch} className="w-full h-10">
-                  <Search size={15} />
+                <button
+                  type="button"
+                  onClick={handleSearch}
+                  className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-[0.97] text-white text-sm font-bold shadow-lg shadow-amber-200 transition-all duration-150"
+                >
+                  <Search size={15} strokeWidth={2.5} />
                   Search Properties
-                </Button>
+                </button>
               </div>
             </div>
             {/* Filter chips */}

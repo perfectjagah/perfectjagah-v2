@@ -23,19 +23,30 @@ export function Footer() {
               <span>PerfectJagah</span>
             </div>
             <p className="text-sm leading-relaxed text-white/50">
-              Pakistan's trusted real estate portal. Find your perfect property
+              Hyderabad's trusted real estate portal. Find your perfect property
               with confidence.
             </p>
             <div className="mt-6 flex gap-3">
-              {[Facebook, Twitter, Instagram].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 hover:bg-amber-500 transition-colors duration-150"
-                >
-                  <Icon size={14} />
-                </a>
-              ))}
+              <a
+                href="#"
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 hover:bg-amber-500 transition-colors duration-150"
+              >
+                <Facebook size={14} />
+              </a>
+              <a
+                href="#"
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 hover:bg-amber-500 transition-colors duration-150"
+              >
+                <Twitter size={14} />
+              </a>
+              <a
+                href="https://www.instagram.com/perfectjagah/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 hover:bg-amber-500 transition-colors duration-150"
+              >
+                <Instagram size={14} />
+              </a>
             </div>
           </div>
 
@@ -93,15 +104,25 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <MapPin size={14} className="mt-0.5 shrink-0 text-amber-400" />
-                <span>Karachi, Pakistan</span>
+                <span>Hyderabad, India</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={14} className="shrink-0 text-amber-400" />
-                <span>+92 300 0000000</span>
+                <a
+                  href="tel:+919885588874"
+                  className="hover:text-amber-400 transition-colors duration-150"
+                >
+                  +91 98855 88874
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail size={14} className="shrink-0 text-amber-400" />
-                <span>info@perfectjagah.pk</span>
+                <a
+                  href="mailto:perfectjagah@gmail.com"
+                  className="hover:text-amber-400 transition-colors duration-150"
+                >
+                  perfectjagah@gmail.com
+                </a>
               </li>
             </ul>
           </div>
@@ -109,9 +130,9 @@ export function Footer() {
 
         <div className="mt-12 border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
           <span>
-            Â© {new Date().getFullYear()} PerfectJagah. All rights reserved.
+            &copy; {new Date().getFullYear()} PerfectJagah. All rights reserved.
           </span>
-          <span>Built with care in Pakistan ðŸ‡µðŸ‡°</span>
+          <span>Built with care in India 🇮🇳</span>
         </div>
       </div>
     </footer>
