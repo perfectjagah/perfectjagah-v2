@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Upload,
   X,
@@ -8,11 +8,16 @@ import {
   ImagePlus,
   Loader2,
   CheckCircle2,
+  FileText,
+  FilePlus,
 } from "lucide-react";
 import {
   getAdminPropertyDetail,
   createProperty,
   updateProperty,
+  getDocumentUrl,
+  uploadPropertyDocuments,
+  deletePropertyDocument,
 } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -56,11 +61,15 @@ export default function PropertyFormPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   const [form, setForm] = useState<FormState>(EMPTY);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
   const [deleteImageIds, setDeleteImageIds] = useState<number[]>([]);
+  const [newDocuments, setNewDocuments] = useState<File[]>([]);
+  const [deleteDocumentIds, setDeleteDocumentIds] = useState<number[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [errors, setErrors] = useState<Partial<FormState>>({});
 
@@ -87,8 +96,16 @@ export default function PropertyFormPage() {
   }, [existingProp]);
 
   const createMut = useMutation({
-    mutationFn: (payload: { data: CreatePropertyData; images: File[] }) =>
-      createProperty(payload.data, payload.images),
+    mutationFn: async (payload: {
+      data: CreatePropertyData;
+      images: File[];
+    }) => {
+      const created = await createProperty(payload.data, payload.images);
+      if (newDocuments.length > 0) {
+        await uploadPropertyDocuments(created.id, newDocuments);
+      }
+      return created;
+    },
     onSuccess: () => {
       toast("Property created successfully.", "success");
       navigate("/admin/properties");
@@ -97,13 +114,30 @@ export default function PropertyFormPage() {
   });
 
   const updateMut = useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       data: UpdatePropertyData;
       newImgs: File[];
       delIds: number[];
-    }) =>
-      updateProperty(Number(id), payload.data, payload.newImgs, payload.delIds),
+    }) => {
+      await updateProperty(
+        Number(id),
+        payload.data,
+        payload.newImgs,
+        payload.delIds,
+      );
+      if (deleteDocumentIds.length > 0) {
+        await Promise.all(
+          deleteDocumentIds.map((docId) =>
+            deletePropertyDocument(Number(id), docId),
+          ),
+        );
+      }
+      if (newDocuments.length > 0) {
+        await uploadPropertyDocuments(Number(id), newDocuments);
+      }
+    },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-property-form", id] });
       toast("Property updated successfully.", "success");
       navigate("/admin/properties");
     },
@@ -173,6 +207,20 @@ export default function PropertyFormPage() {
   const toggleDeleteExisting = (imgId: number) =>
     setDeleteImageIds((p) =>
       p.includes(imgId) ? p.filter((x) => x !== imgId) : [...p, imgId],
+    );
+
+  const addDocumentFiles = (files: FileList | null) => {
+    if (!files) return;
+    const arr = Array.from(files);
+    setNewDocuments((prev) => [...prev, ...arr]);
+  };
+
+  const removeNewDocument = (idx: number) =>
+    setNewDocuments((p) => p.filter((_, i) => i !== idx));
+
+  const toggleDeleteDocument = (docId: number) =>
+    setDeleteDocumentIds((p) =>
+      p.includes(docId) ? p.filter((x) => x !== docId) : [...p, docId],
     );
 
   const set =
@@ -468,6 +516,115 @@ export default function PropertyFormPage() {
                         type="button"
                         onClick={() => removeNewImage(i)}
                         className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </FormCard>
+
+            {/* Documents */}
+            <FormCard>
+              <p className="text-sm font-semibold text-charcoal mb-3">
+                Documents
+              </p>
+
+              {/* Existing documents (edit mode) */}
+              {isEdit &&
+                existingProp &&
+                existingProp.documents &&
+                existingProp.documents.length > 0 && (
+                  <div className="mb-3 space-y-1.5">
+                    {existingProp.documents.map((doc) => {
+                      const marked = deleteDocumentIds.includes(doc.id);
+                      return (
+                        <div
+                          key={doc.id}
+                          className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition ${
+                            marked
+                              ? "border-red-200 bg-red-50 text-red-400 line-through"
+                              : "border-muted-200 bg-[#faf9f6] text-charcoal"
+                          }`}
+                        >
+                          <FileText
+                            size={12}
+                            className="shrink-0 text-amber-500"
+                          />
+                          <a
+                            href={getDocumentUrl(Number(id), doc.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 truncate hover:text-amber-600"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {doc.displayName || doc.fileName}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => toggleDeleteDocument(doc.id)}
+                            className={`w-5 h-5 rounded-full flex items-center justify-center transition shrink-0 ${
+                              marked
+                                ? "bg-green-500 text-white"
+                                : "bg-red-100 text-red-500 hover:bg-red-500 hover:text-white"
+                            }`}
+                            title={marked ? "Undo remove" : "Remove document"}
+                          >
+                            {marked ? (
+                              <CheckCircle2 size={10} />
+                            ) : (
+                              <X size={10} />
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })}
+                    {deleteDocumentIds.length > 0 && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {deleteDocumentIds.length} document
+                        {deleteDocumentIds.length !== 1 ? "s" : ""} will be
+                        removed on save
+                      </p>
+                    )}
+                  </div>
+                )}
+
+              {/* Upload new documents */}
+              <div
+                onClick={() => docInputRef.current?.click()}
+                className="border-2 border-dashed border-muted-200 hover:border-amber-400 hover:bg-amber-50/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition"
+              >
+                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                  <FilePlus size={15} className="text-amber-600" />
+                </div>
+                <p className="text-xs font-medium text-charcoal">
+                  Add PDFs / Documents
+                </p>
+                <p className="text-[11px] text-muted-400">PDF, DOCX, XLSX</p>
+              </div>
+              <input
+                ref={docInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.xls,.xlsx"
+                multiple
+                className="hidden"
+                onChange={(e) => addDocumentFiles(e.target.files)}
+              />
+
+              {newDocuments.length > 0 && (
+                <div className="mt-2 space-y-1.5">
+                  {newDocuments.map((file, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-charcoal"
+                    >
+                      <FileText size={12} className="shrink-0 text-amber-500" />
+                      <span className="flex-1 truncate">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeNewDocument(i)}
+                        className="w-5 h-5 rounded-full bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition shrink-0"
                       >
                         <X size={10} />
                       </button>

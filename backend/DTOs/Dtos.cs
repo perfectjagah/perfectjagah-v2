@@ -25,10 +25,13 @@ public record PropertyDetailDto(
     string? Amenities,
     DateTime CreatedAt,
     bool IsActive,
-    List<ImageInfoDto> Images
+    List<ImageInfoDto> Images,
+    List<DocumentInfoDto> Documents
 );
 
 public record ImageInfoDto(int Id, string FileName, string ContentType);
+
+public record DocumentInfoDto(int Id, string FileName, string DisplayName, string ContentType);
 
 public class CreatePropertyDto
 {

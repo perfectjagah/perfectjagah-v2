@@ -13,11 +13,14 @@ import {
   Home,
   Check,
   ArrowLeft,
+  FileText,
+  Download,
 } from "lucide-react";
 import {
   getPropertyDetail,
   getSimilarProperties,
   submitInquiry,
+  getDocumentUrl,
 } from "@/lib/api";
 import type { CreateInquiryData } from "@/types";
 import { formatPrice, formatArea, formatDate, getImageUrl } from "@/lib/utils";
@@ -285,6 +288,37 @@ export default function PropertyDetailPage() {
                         <Check size={11} />
                         {a}
                       </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {property.documents && property.documents.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="font-bold text-charcoal mb-3 text-sm uppercase tracking-widest">
+                    Documents
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    {property.documents.map((doc) => (
+                      <a
+                        key={doc.id}
+                        href={getDocumentUrl(property.id, doc.id)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-3 rounded-xl border border-muted-200 bg-[#faf9f6] px-4 py-2.5 text-sm font-medium text-charcoal hover:border-amber-400 hover:bg-amber-50 transition-colors group"
+                      >
+                        <FileText
+                          size={15}
+                          className="text-amber-500 shrink-0"
+                        />
+                        <span className="flex-1 truncate">
+                          {doc.displayName || doc.fileName}
+                        </span>
+                        <Download
+                          size={13}
+                          className="text-muted-400 group-hover:text-amber-600 transition-colors shrink-0"
+                        />
+                      </a>
                     ))}
                   </div>
                 </div>

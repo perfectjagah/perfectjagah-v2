@@ -64,20 +64,23 @@ public class PropertyRepository : IPropertyRepository
 
     public async Task<PropertyDetailDto?> GetDetailAsync(int id, bool includeInactive = false)
     {
-        var p = await _db.Properties
+        // Projection keeps binary columns (ImageData, DocumentData) out of the SELECT entirely
+        return await _db.Properties
             .AsNoTracking()
-            .Include(p => p.Images)
             .Where(p => p.Id == id && (includeInactive || p.IsActive))
+            .Select(p => new PropertyDetailDto(
+                p.Id, p.Title, p.Description, p.Price,
+                p.Location, p.PropertyType, p.AreaSqFt, p.Amenities,
+                p.CreatedAt, p.IsActive,
+                p.Images
+                    .Select(i => new ImageInfoDto(i.Id, i.FileName, i.ContentType))
+                    .ToList(),
+                p.Documents
+                    .OrderBy(d => d.DisplayName)
+                    .Select(d => new DocumentInfoDto(d.Id, d.FileName, d.DisplayName, d.ContentType))
+                    .ToList()
+            ))
             .FirstOrDefaultAsync();
-
-        if (p is null) return null;
-
-        return new PropertyDetailDto(
-            p.Id, p.Title, p.Description, p.Price,
-            p.Location, p.PropertyType, p.AreaSqFt, p.Amenities,
-            p.CreatedAt, p.IsActive,
-            p.Images.Select(i => new ImageInfoDto(i.Id, i.FileName, i.ContentType)).ToList()
-        );
     }
 
     public Task<Property?> GetEntityAsync(int id) =>

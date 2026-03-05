@@ -12,11 +12,13 @@ public class PropertiesController : ControllerBase
 {
     private readonly IPropertyRepository _props;
     private readonly IImageRepository    _images;
+    private readonly IDocumentRepository _documents;
 
-    public PropertiesController(IPropertyRepository props, IImageRepository images)
+    public PropertiesController(IPropertyRepository props, IImageRepository images, IDocumentRepository documents)
     {
-        _props  = props;
-        _images = images;
+        _props     = props;
+        _images    = images;
+        _documents = documents;
     }
 
     /// <summary>Search / list properties with optional filters and pagination.</summary>
@@ -68,5 +70,27 @@ public class PropertiesController : ControllerBase
         var img = await _images.GetAsync(imageId);
         if (img is null || img.PropertyId != propertyId) return NotFound();
         return File(img.ImageData, img.ContentType, img.FileName);
+    }
+
+    /// <summary>List document metadata for a property (no binary data).</summary>
+    [HttpGet("{propertyId:int}/documents")]
+    public async Task<IActionResult> ListDocuments(int propertyId)
+    {
+        var prop = await _props.GetDetailAsync(propertyId);
+        if (prop is null) return NotFound();
+        var docs = await _documents.GetByPropertyAsync(propertyId);
+        var dtos = docs.Select(d => new DocumentInfoDto(d.Id, d.FileName, d.DisplayName, d.ContentType)).ToList();
+        return Ok(dtos);
+    }
+
+    /// <summary>Stream a single document (PDF / DOCX).</summary>
+    [HttpGet("{propertyId:int}/documents/{documentId:int}")]
+    public async Task<IActionResult> GetDocument(int propertyId, int documentId)
+    {
+        var doc = await _documents.GetAsync(documentId);
+        if (doc is null || doc.PropertyId != propertyId) return NotFound();
+        // Serve inline so PDFs open in-browser; browsers will fall back to download for other types
+        Response.Headers.Append("Content-Disposition", $"inline; filename=\"{doc.FileName}\"");
+        return File(doc.DocumentData, doc.ContentType);
     }
 }

@@ -18,6 +18,13 @@ export interface ImageInfo {
   contentType: string;
 }
 
+export interface DocumentInfo {
+  id: number;
+  fileName: string;
+  displayName: string;
+  contentType: string;
+}
+
 export interface PropertyDetail {
   id: number;
   title: string;
@@ -30,6 +37,7 @@ export interface PropertyDetail {
   createdAt: string;
   isActive: boolean;
   images: ImageInfo[];
+  documents: DocumentInfo[];
 }
 
 export interface CreatePropertyData {

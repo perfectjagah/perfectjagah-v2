@@ -13,11 +13,13 @@ public class AdminPropertiesController : ControllerBase
 {
     private readonly IPropertyRepository _props;
     private readonly IImageRepository    _images;
+    private readonly IDocumentRepository _documents;
 
-    public AdminPropertiesController(IPropertyRepository props, IImageRepository images)
+    public AdminPropertiesController(IPropertyRepository props, IImageRepository images, IDocumentRepository documents)
     {
-        _props  = props;
-        _images = images;
+        _props     = props;
+        _images    = images;
+        _documents = documents;
     }
 
     /// <summary>List all properties (including inactive) with pagination.</summary>
@@ -116,6 +118,30 @@ public class AdminPropertiesController : ControllerBase
         return deleted ? NoContent() : NotFound();
     }
 
+    /// <summary>Upload one or more documents to a property.</summary>
+    [HttpPost("{id:int}/documents")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadDocuments(int id, [FromForm] List<IFormFile>? documents)
+    {
+        var entity = await _props.GetEntityAsync(id);
+        if (entity is null) return NotFound();
+
+        if (documents is { Count: > 0 })
+            await SaveDocumentsAsync(id, documents);
+
+        return NoContent();
+    }
+
+    /// <summary>Delete a single document from a property.</summary>
+    [HttpDelete("{id:int}/documents/{documentId:int}")]
+    public async Task<IActionResult> DeleteDocument(int id, int documentId)
+    {
+        var doc = await _documents.GetAsync(documentId);
+        if (doc is null || doc.PropertyId != id) return NotFound();
+        await _documents.DeleteAsync(documentId);
+        return NoContent();
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────
 
     private async Task SaveImagesAsync(int propertyId, List<IFormFile> files)
@@ -135,6 +161,34 @@ public class AdminPropertiesController : ControllerBase
                 ImageData   = ms.ToArray(),
                 ContentType = file.ContentType,
                 FileName    = Path.GetFileName(file.FileName)
+            });
+        }
+    }
+
+    private async Task SaveDocumentsAsync(int propertyId, List<IFormFile> files)
+    {
+        const long maxSize = 20 * 1024 * 1024; // 20 MB per document
+
+        foreach (var file in files)
+        {
+            if (file.Length == 0 || file.Length > maxSize) continue;
+
+            var fileName    = Path.GetFileName(file.FileName);
+            var displayName = Path.GetFileNameWithoutExtension(fileName)
+                                  .Replace('_', ' ')
+                                  .Replace('-', ' ')
+                                  .Trim();
+
+            using var ms = new MemoryStream();
+            await file.CopyToAsync(ms);
+
+            await _documents.AddAsync(new PropertyDocument
+            {
+                PropertyId   = propertyId,
+                DocumentData = ms.ToArray(),
+                ContentType  = file.ContentType,
+                FileName     = fileName,
+                DisplayName  = displayName
             });
         }
     }

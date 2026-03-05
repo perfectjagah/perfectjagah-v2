@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<PropertyImage> PropertyImages => Set<PropertyImage>();
+    public DbSet<PropertyDocument> PropertyDocuments => Set<PropertyDocument>();
     public DbSet<Inquiry> Inquiries => Set<Inquiry>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
 
@@ -29,6 +30,11 @@ public class AppDbContext : DbContext
              .HasForeignKey(i => i.PropertyId)
              .OnDelete(DeleteBehavior.Cascade);
 
+            e.HasMany(p => p.Documents)
+             .WithOne(d => d.Property)
+             .HasForeignKey(d => d.PropertyId)
+             .OnDelete(DeleteBehavior.Cascade);
+
             e.HasMany(p => p.Inquiries)
              .WithOne(i => i.Property)
              .HasForeignKey(i => i.PropertyId)
@@ -47,6 +53,12 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<PropertyImage>(e =>
         {
             e.HasIndex(i => i.PropertyId);
+        });
+
+        // ── PropertyDocument ──────────────────────────────────────────────
+        modelBuilder.Entity<PropertyDocument>(e =>
+        {
+            e.HasIndex(d => d.PropertyId);
         });
 
         // ── AdminUser ─────────────────────────────────────────────────────

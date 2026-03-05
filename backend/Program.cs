@@ -18,8 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IInquiryRepository,  InquiryRepository>();
-builder.Services.AddScoped<IImageRepository,    ImageRepository>();
-
+builder.Services.AddScoped<IImageRepository,    ImageRepository>();builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 // ── Helpers ───────────────────────────────────────────────────────────────────
 builder.Services.AddSingleton<JwtHelper>();
 

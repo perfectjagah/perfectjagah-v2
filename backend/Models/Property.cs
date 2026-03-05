@@ -33,5 +33,6 @@ public class Property
 
     // Navigation
     public ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
+    public ICollection<PropertyDocument> Documents { get; set; } = new List<PropertyDocument>();
     public ICollection<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
 }

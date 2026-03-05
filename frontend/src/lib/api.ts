@@ -53,6 +53,18 @@ export const getSimilarProperties = (id: number) =>
     .get<PropertySummary[]>(`/api/properties/${id}/similar`)
     .then((r) => r.data);
 
+export const getPropertyDocuments = (propertyId: number) =>
+  api
+    .get<
+      import("@/types").DocumentInfo[]
+    >(`/api/properties/${propertyId}/documents`)
+    .then((r) => r.data);
+
+export const getDocumentUrl = (
+  propertyId: number,
+  documentId: number,
+): string => `${BASE_URL}/api/properties/${propertyId}/documents/${documentId}`;
+
 // ── Public: Inquiries ─────────────────────────────────────────────────────────
 
 export const submitInquiry = (data: CreateInquiryData) =>
@@ -110,6 +122,19 @@ export const updateProperty = (
 
 export const deleteProperty = (id: number) =>
   api.delete(`/api/admin/properties/${id}`);
+
+export const uploadPropertyDocuments = (id: number, documents: File[]) => {
+  const form = new FormData();
+  documents.forEach((doc) => form.append("documents", doc));
+  return api.post(`/api/admin/properties/${id}/documents`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+export const deletePropertyDocument = (
+  propertyId: number,
+  documentId: number,
+) => api.delete(`/api/admin/properties/${propertyId}/documents/${documentId}`);
 
 // ── Admin: Inquiries ──────────────────────────────────────────────────────────
 
