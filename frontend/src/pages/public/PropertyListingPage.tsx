@@ -12,6 +12,7 @@ import {
 import { getProperties } from "@/lib/api";
 import type { PropertyFilters } from "@/types";
 import { PropertyCard } from "@/components/shared/PropertyCard";
+import { PropertyMap } from "@/components/shared/PropertyMap";
 import { Pagination } from "@/components/shared/Pagination";
 import { PageLoader } from "@/components/shared/LoadingSpinner";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -426,18 +427,18 @@ export default function PropertyListingPage() {
               )}
             </div>
 
-            {/* Right: Map placeholder */}
-            <div className="flex-1 rounded-2xl overflow-hidden bg-white border border-muted-200 shadow-sm flex items-center justify-center">
-              <div className="text-center text-muted-400">
-                <Map size={48} className="mx-auto mb-3 opacity-30" />
-                <p className="font-medium text-sm">Interactive Map</p>
-                <p className="text-xs mt-1 opacity-60">
-                  Map view â€” showing {data?.items.length ?? 0} properties
-                </p>
-                <p className="text-xs mt-2 opacity-40">
-                  (Install react-leaflet to enable live map)
-                </p>
-              </div>
+            {/* Right: Live map */}
+            <div className="flex-1 rounded-2xl overflow-hidden border border-muted-200 shadow-sm">
+              {data && data.items.length > 0 ? (
+                <PropertyMap properties={data.items} />
+              ) : (
+                <div className="h-full flex items-center justify-center bg-white">
+                  <div className="text-center text-muted-400">
+                    <Map size={48} className="mx-auto mb-3 opacity-30" />
+                    <p className="font-medium text-sm">No properties to show</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
