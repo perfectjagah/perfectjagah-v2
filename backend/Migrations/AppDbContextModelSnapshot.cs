@@ -17,6 +17,7 @@ namespace PerfectJagah.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -52,7 +53,7 @@ namespace PerfectJagah.API.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("AdminUsers");
+                    b.ToTable("AdminUsers", "dbo");
                 });
 
             modelBuilder.Entity("PerfectJagah.API.Models.Inquiry", b =>
@@ -99,7 +100,7 @@ namespace PerfectJagah.API.Migrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("Inquiries");
+                    b.ToTable("Inquiries", "dbo");
                 });
 
             modelBuilder.Entity("PerfectJagah.API.Models.Property", b =>
@@ -154,7 +155,7 @@ namespace PerfectJagah.API.Migrations
 
                     b.HasIndex("PropertyType");
 
-                    b.ToTable("Properties");
+                    b.ToTable("Properties", "dbo");
                 });
 
             modelBuilder.Entity("PerfectJagah.API.Models.PropertyDocument", b =>
@@ -194,7 +195,7 @@ namespace PerfectJagah.API.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("PropertyDocuments");
+                    b.ToTable("PropertyDocuments", "dbo");
                 });
 
             modelBuilder.Entity("PerfectJagah.API.Models.PropertyImage", b =>
@@ -229,7 +230,7 @@ namespace PerfectJagah.API.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("PropertyImages");
+                    b.ToTable("PropertyImages", "dbo");
                 });
 
             modelBuilder.Entity("PerfectJagah.API.Models.Inquiry", b =>

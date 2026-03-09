@@ -13,6 +13,7 @@ namespace PerfectJagah.API.Migrations
         {
             migrationBuilder.CreateTable(
                 name: "AdminUsers",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -29,6 +30,7 @@ namespace PerfectJagah.API.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Properties",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -50,6 +52,7 @@ namespace PerfectJagah.API.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Inquiries",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -68,6 +71,7 @@ namespace PerfectJagah.API.Migrations
                     table.ForeignKey(
                         name: "FK_Inquiries_Properties_PropertyId",
                         column: x => x.PropertyId,
+                        principalSchema: "dbo",
                         principalTable: "Properties",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
@@ -75,6 +79,7 @@ namespace PerfectJagah.API.Migrations
 
             migrationBuilder.CreateTable(
                 name: "PropertyImages",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -91,6 +96,7 @@ namespace PerfectJagah.API.Migrations
                     table.ForeignKey(
                         name: "FK_PropertyImages_Properties_PropertyId",
                         column: x => x.PropertyId,
+                        principalSchema: "dbo",
                         principalTable: "Properties",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -99,42 +105,50 @@ namespace PerfectJagah.API.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AdminUsers_Username",
                 table: "AdminUsers",
+                schema: "dbo",
                 column: "Username",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Inquiries_PropertyId",
                 table: "Inquiries",
+                schema: "dbo",
                 column: "PropertyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Inquiries_Status",
                 table: "Inquiries",
+                schema: "dbo",
                 column: "Status");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Properties_IsActive",
                 table: "Properties",
+                schema: "dbo",
                 column: "IsActive");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Properties_Location",
                 table: "Properties",
+                schema: "dbo",
                 column: "Location");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Properties_Price",
                 table: "Properties",
+                schema: "dbo",
                 column: "Price");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Properties_PropertyType",
                 table: "Properties",
+                schema: "dbo",
                 column: "PropertyType");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PropertyImages_PropertyId",
                 table: "PropertyImages",
+                schema: "dbo",
                 column: "PropertyId");
         }
 
@@ -142,16 +156,20 @@ namespace PerfectJagah.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AdminUsers");
+                name: "AdminUsers",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Inquiries");
+                name: "Inquiries",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "PropertyImages");
+                name: "PropertyImages",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Properties");
+                name: "Properties",
+                schema: "dbo");
         }
     }
 }

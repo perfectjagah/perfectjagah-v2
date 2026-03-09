@@ -13,6 +13,7 @@ namespace PerfectJagah.API.Migrations
         {
             migrationBuilder.CreateTable(
                 name: "PropertyDocuments",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -30,6 +31,7 @@ namespace PerfectJagah.API.Migrations
                     table.ForeignKey(
                         name: "FK_PropertyDocuments_Properties_PropertyId",
                         column: x => x.PropertyId,
+                        principalSchema: "dbo",
                         principalTable: "Properties",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -38,6 +40,7 @@ namespace PerfectJagah.API.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PropertyDocuments_PropertyId",
                 table: "PropertyDocuments",
+                schema: "dbo",
                 column: "PropertyId");
         }
 
@@ -45,7 +48,8 @@ namespace PerfectJagah.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "PropertyDocuments");
+                name: "PropertyDocuments",
+                schema: "dbo");
         }
     }
 }
