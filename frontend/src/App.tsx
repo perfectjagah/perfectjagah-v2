@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/components/ui/Toast";
 import { PrivateRoute } from "@/components/shared/PrivateRoute";
+import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
 
 import PublicLayout from "@/pages/public/PublicLayout";
 import AdminLayout from "@/pages/admin/AdminLayout";
@@ -33,6 +34,7 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <BrowserRouter>
+            <GoogleAnalytics />
             <Routes>
               <Route element={<PublicLayout />}>
                 <Route index element={<HomePage />} />
@@ -48,7 +50,10 @@ export default function App() {
                   <Route path="dashboard" element={<DashboardPage />} />
                   <Route path="properties" element={<ManagePropertiesPage />} />
                   <Route path="properties/new" element={<PropertyFormPage />} />
-                  <Route path="properties/:id/edit" element={<PropertyFormPage />} />
+                  <Route
+                    path="properties/:id/edit"
+                    element={<PropertyFormPage />}
+                  />
                   <Route path="inquiries" element={<ManageInquiriesPage />} />
                 </Route>
               </Route>
