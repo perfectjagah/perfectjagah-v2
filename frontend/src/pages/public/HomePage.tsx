@@ -402,7 +402,7 @@ export default function HomePage() {
             <PageLoader />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredData?.items.map((p) => (
+              {featuredData?.items?.map((p) => (
                 <PropertyCard key={p.id} property={p} />
               ))}
             </div>

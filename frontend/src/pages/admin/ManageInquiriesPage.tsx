@@ -89,7 +89,7 @@ export default function ManageInquiriesPage() {
           </div>
 
           <div className="divide-y divide-muted-200">
-            {data?.items.map((inq) => (
+            {data?.items?.map((inq) => (
               <div
                 key={inq.id}
                 className="grid grid-cols-12 gap-3 px-5 py-4 hover:bg-muted/50 transition-colors items-center"

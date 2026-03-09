@@ -392,7 +392,7 @@ export default function PropertyListingPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                  {data?.items.map((p) => (
+                  {data?.items?.map((p) => (
                     <PropertyCard key={p.id} property={p} />
                   ))}
                 </div>
@@ -423,7 +423,9 @@ export default function PropertyListingPage() {
                   <p className="text-muted-400">No properties found.</p>
                 </div>
               ) : (
-                data?.items.map((p) => <PropertyCard key={p.id} property={p} />)
+                data?.items?.map((p) => (
+                  <PropertyCard key={p.id} property={p} />
+                ))
               )}
             </div>
 

@@ -106,7 +106,7 @@ export default function ManagePropertiesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-          {data?.items.map((p) => {
+          {data?.items?.map((p) => {
             const imgSrc = p.primaryImageId
               ? getImageUrl(p.id, p.primaryImageId)
               : null;
