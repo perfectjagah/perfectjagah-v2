@@ -32,7 +32,9 @@ static string ResolveConnectionString(IConfiguration config)
 
 // ── Database ──────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(opts =>
-    opts.UseSqlServer(ResolveConnectionString(builder.Configuration)));
+    opts.UseSqlServer(
+        ResolveConnectionString(builder.Configuration),
+        sql => sql.MigrationsHistoryTable("__EFMigrationsHistory", "dbo")));
 
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
