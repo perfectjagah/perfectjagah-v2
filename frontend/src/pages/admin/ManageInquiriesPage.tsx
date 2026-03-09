@@ -69,7 +69,7 @@ export default function ManageInquiriesPage() {
 
       {isLoading ? (
         <PageLoader />
-      ) : data?.items.length === 0 ? (
+      ) : data?.items?.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-muted-200 bg-white p-16 text-center">
           <MessageSquare
             size={32}

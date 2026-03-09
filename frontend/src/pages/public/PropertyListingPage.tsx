@@ -378,7 +378,7 @@ export default function PropertyListingPage() {
             <div className="flex-1 min-w-0">
               {isLoading || isFetching ? (
                 <PageLoader />
-              ) : data?.items.length === 0 ? (
+              ) : data?.items?.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-muted-200 bg-white p-16 text-center">
                   <p className="text-muted-400 text-lg font-medium">
                     No properties found.
@@ -418,7 +418,7 @@ export default function PropertyListingPage() {
             <div className="w-[400px] shrink-0 overflow-y-auto space-y-3 pr-1">
               {isLoading || isFetching ? (
                 <PageLoader />
-              ) : data?.items.length === 0 ? (
+              ) : data?.items?.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-muted-200 bg-white p-8 text-center">
                   <p className="text-muted-400">No properties found.</p>
                 </div>
@@ -431,7 +431,7 @@ export default function PropertyListingPage() {
 
             {/* Right: Live map */}
             <div className="flex-1 rounded-2xl overflow-hidden border border-muted-200 shadow-sm">
-              {data && data.items.length > 0 ? (
+              {data && data.items?.length > 0 ? (
                 <PropertyMap properties={data.items} />
               ) : (
                 <div className="h-full flex items-center justify-center bg-white">

@@ -94,7 +94,7 @@ export default function ManagePropertiesPage() {
       {/* Grid */}
       {isLoading ? (
         <PageLoader />
-      ) : data?.items.length === 0 ? (
+      ) : data?.items?.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-muted-200 bg-white p-16 text-center">
           <p className="text-muted-400 font-medium">No properties found.</p>
           <Button
